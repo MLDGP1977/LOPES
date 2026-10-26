@@ -1,1 +1,2670 @@
-teste
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Campanhas de Promoção</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@1.0.2/dist/basecoat.cdn.min.css">
+  <style>
+/* Skip artifact shell — fixed styles served beside every artifact.
+   Complements basecoat; artifacts override --accent for their own identity. */
+:root {
+  color-scheme: light dark;
+  --accent: #2563eb;
+  --accent-contrast: #ffffff;
+  --accent-text: color-mix(in srgb, var(--accent) 72%, #000);
+  --bg: #f8f9fb;
+  --surface: #ffffff;
+  --text: #14171f;
+  --text-muted: #5b6472;
+  --border: rgba(20, 23, 31, 0.10);
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(20, 23, 31, 0.08);
+  --space: 16px;
+}
+/* Theme resolution. Without data-theme the viewer's system preference decides,
+   as it always did. With it, the artifact's own choice wins in BOTH directions:
+   a page that hardcodes one palette must not be handed the opposite set of
+   tokens by the machine it happens to be opened on. The dark values appear
+   twice because a media query cannot be folded into a selector list.
+   The attribute sits inside :where() so these blocks keep the specificity of a
+   bare :root — the page's own <style> is linked after this file and must go on
+   overriding any token it wants, exactly as it could before. */
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    --accent-text: color-mix(in srgb, var(--accent) 78%, #fff);
+    --bg: #101318;
+    --surface: #181c23;
+    --text: #eef1f6;
+    --text-muted: #9aa4b2;
+    --border: rgba(238, 241, 246, 0.12);
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  }
+}
+:root:where([data-theme="dark"]) {
+  color-scheme: dark;
+  --accent-text: color-mix(in srgb, var(--accent) 78%, #fff);
+  --bg: #101318;
+  --surface: #181c23;
+  --text: #eef1f6;
+  --text-muted: #9aa4b2;
+  --border: rgba(238, 241, 246, 0.12);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+:root:where([data-theme="light"]) { color-scheme: light; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; display: block; }
+
+.shell-container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+.shell-section { padding: calc(var(--space) * 2) 0; }
+.shell-grid { display: grid; gap: var(--space); grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.shell-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: var(--space); }
+.shell-footer { padding: 24px 0 40px; color: var(--text-muted); font-size: 13px; }
+
+.shell-hero { padding: calc(var(--space) * 3) 0 calc(var(--space) * 2); }
+.shell-hero h1 { font-size: clamp(26px, 4vw, 40px); line-height: 1.15; margin: 0 0 10px; text-wrap: balance; }
+.shell-hero p { color: var(--text-muted); max-width: 60ch; margin: 0; }
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--space);
+}
+
+.kpi { display: flex; flex-direction: column; gap: 4px; }
+.kpi .kpi-value { font-size: 28px; font-weight: 650; line-height: 1.1; }
+.kpi .kpi-label { font-size: 13px; color: var(--text-muted); }
+.kpi .kpi-delta { font-size: 12.5px; font-weight: 600; }
+.kpi .kpi-delta.up { color: #0a8f3c; }
+.kpi .kpi-delta.down { color: #cf3131; }
+
+table.shell-table { border-collapse: collapse; width: 100%; font-size: 14px; }
+table.shell-table th {
+  text-align: left; font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text-muted); font-weight: 600;
+}
+table.shell-table th, table.shell-table td { padding: 9px 12px 9px 0; border-bottom: 1px solid var(--border); }
+table.shell-table td.num, table.shell-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+
+.chart-box { width: 100%; min-height: 220px; }
+.chart-box svg { width: 100%; height: auto; display: block; }
+
+.muted { color: var(--text-muted); }
+.accent { color: var(--accent-text); }
+.shell-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent-text);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .shell-fade { animation: shell-fade 400ms ease both; }
+  @keyframes shell-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+}
+
+</style>
+  
+  <style>
+    :root {
+      --accent: #e11d48;
+      --accent-text: #be123c;
+      --accent-contrast: #ffffff;
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --text: #111827;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 14px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    #app-container {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.05);
+      padding-bottom: 78px;
+    }
+
+    /* Header */
+    .app-header {
+      padding: 16px 20px 14px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+    .app-header h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .app-header p {
+      margin: 2px 0 0;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* Content Area */
+    .tab-content {
+      display: none;
+      padding: 16px;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards & Panels */
+    .promo-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .kpi-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-sm);
+      padding: 12px 8px;
+      text-align: center;
+    }
+    .kpi-num {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent-text);
+      line-height: 1.2;
+    }
+    .kpi-title {
+      font-size: 0.75rem;
+      color: #475569;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    /* Quick action buttons */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .btn-action {
+      min-height: 44px;
+      border-radius: var(--radius-sm);
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      color: #0f172a;
+      font-size: 0.88rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      padding: 8px 12px;
+      transition: all 0.15s;
+    }
+    .btn-action:hover, .btn-action:active {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+    .btn-primary-action {
+      background: var(--accent);
+      color: var(--accent-contrast);
+      border-color: var(--accent);
+    }
+    .btn-primary-action:hover, .btn-primary-action:active {
+      background: #be123c;
+      border-color: #be123c;
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 12px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 4px;
+    }
+    .form-control {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      border: 1px solid #cbd5e1;
+      border-radius: var(--radius-sm);
+      background: #ffffff;
+      color: #0f172a;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-control:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.15);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* Live Preview Promotion Card */
+    .preview-box {
+      background: #fff;
+      border: 1.5px dashed #cbd5e1;
+      border-radius: var(--radius);
+      padding: 12px;
+      margin: 16px 0;
+      position: relative;
+    }
+    .preview-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: 8px;
+      display: inline-block;
+    }
+    .promo-flyer {
+      background: #ffffff;
+      border: 1px solid #f1f5f9;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    }
+    .promo-flyer-img {
+      width: 100%;
+      height: 180px;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .promo-flyer-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .promo-flyer-img .no-img {
+      font-size: 3rem;
+      color: #94a3b8;
+    }
+    .discount-tag {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: var(--accent);
+      color: #ffffff;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(225, 29, 72, 0.4);
+      z-index: 5;
+    }
+    .promo-flyer-body {
+      padding: 14px;
+    }
+    .promo-flyer-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+    .promo-prices {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .price-original {
+      font-size: 0.88rem;
+      color: #94a3b8;
+      text-decoration: line-through;
+    }
+    .price-promo {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--accent-text);
+    }
+    .promo-validity {
+      font-size: 0.78rem;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* List items */
+    .item-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .contact-card, .campaign-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .campaign-thumb {
+      width: 52px;
+      height: 52px;
+      border-radius: 8px;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 1px solid #e2e8f0;
+    }
+    .campaign-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .item-details {
+      flex: 1;
+      min-width: 0;
+    }
+    .item-name {
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .item-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .badge-status {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .badge-active {
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .badge-expired {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    /* Actions buttons inline */
+    .btn-icon-del {
+      min-height: 44px;
+      min-width: 44px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: #fef2f2;
+      color: #b91c1c;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .btn-icon-del:hover {
+      background: #fee2e2;
+    }
+    .btn-edit {
+      min-height: 44px;
+      min-width: 44px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: #f1f5f9;
+      color: #334155;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* Bottom Fixed Nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      background: #ffffff;
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      height: 64px;
+      z-index: 50;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
+    }
+    .nav-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      background: transparent;
+      border: none;
+      color: #64748b;
+      cursor: pointer;
+      min-height: 44px;
+      padding: 6px 0;
+      font-size: 0.72rem;
+      font-weight: 600;
+      transition: color 0.15s;
+    }
+    .nav-btn .nav-icon {
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+    .nav-btn.active {
+      color: var(--accent-text);
+    }
+
+    /* Recipients Checklist */
+    .recipients-box {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      background: #f8fafc;
+      margin-top: 8px;
+    }
+    .recipient-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      min-height: 38px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .recipient-row:last-child {
+      border-bottom: none;
+    }
+    .recipient-row input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .recipient-info {
+      font-size: 0.85rem;
+      line-height: 1.2;
+    }
+    .recipient-info span {
+      display: block;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+    /* Output email display */
+    .email-output-box {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      margin: 16px 0;
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: #1e293b;
+      white-space: pre-wrap;
+      word-break: break-word;
+      user-select: all;
+    }
+
+    /* Toast Notification */
+    #toast {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-30px);
+      background: #1e293b;
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .footer-note {
+      font-size: 0.75rem;
+      color: #64748b;
+      text-align: center;
+      margin: 20px 0 10px;
+      padding: 0 10px;
+      line-height: 1.4;
+    }
+
+    /* WhatsApp Modal / Bottom Sheet */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 200;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-sheet {
+      background: #ffffff;
+      width: 100%;
+      max-width: 480px;
+      border-radius: 18px 18px 0 0;
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.2);
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(100%);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal-overlay.active .modal-sheet {
+      transform: translateY(0);
+    }
+    @media (min-width: 600px) {
+      .modal-overlay {
+        align-items: center;
+        padding: 20px;
+      }
+      .modal-sheet {
+        max-width: 400px;
+        border-radius: var(--radius);
+        transform: scale(0.95);
+        transition: transform 0.2s ease;
+      }
+      .modal-overlay.active .modal-sheet {
+        transform: scale(1);
+      }
+    }
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-close-btn {
+      background: #f1f5f9;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 1rem;
+      color: #64748b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s;
+    }
+    .modal-close-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+    .modal-body {
+      padding: 12px 16px 20px;
+      overflow-y: auto;
+      max-height: calc(80vh - 70px);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .wa-contact-row {
+      display: flex;
+      flex-direction: column;
+      padding: 12px 14px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .wa-contact-row:hover, .wa-contact-row:active {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+    .wa-contact-row-name {
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: #0f172a;
+    }
+    .wa-contact-row-num {
+      font-size: 0.82rem;
+      color: #047857;
+      font-weight: 600;
+      margin-top: 3px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Print styles */
+    @media print {
+      .bottom-nav, .quick-actions, button {
+        display: none !important;
+      }
+      #app-container {
+        box-shadow: none;
+        max-width: 100%;
+        padding-bottom: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="app-container">
+  <!-- Toast Notification -->
+  <div id="toast" role="alert" aria-live="polite">
+    <span id="toast-icon">✓</span>
+    <span id="toast-msg">Mensagem</span>
+  </div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <h1 style="margin:0; font-size:1.25rem; font-weight:700; color:#0f172a; display:flex; align-items:center; gap:10px;">
+      <img id="app-mascot" src="https://mldgp1977.github.io/LOPES/Logo.png" alt="Mascote" onerror="this.style.display='none'" style="height:40px; width:auto; border-radius:8px; flex-shrink:0; object-fit:contain;">
+      <span>Campanhas de Promoção</span>
+    </h1>
+    <p style="margin:4px 0 0; font-size:0.82rem; color:var(--text-muted);">
+      Cadastre contatos, crie promoções e gere e-mails prontos
+    </p>
+  </header>
+
+  <!-- TAB 1: INÍCIO -->
+  <main id="tab-home" class="tab-content active" role="tabpanel">
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-num" id="dash-contacts-count">0</div>
+        <div class="kpi-title">Contatos</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num" id="dash-campaigns-count">0</div>
+        <div class="kpi-title">Campanhas</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num" id="dash-active-count">0</div>
+        <div class="kpi-title">Ativas</div>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <button class="btn-action btn-primary-action" onclick="switchTab('campaigns'); openNewCampaignForm();">
+        <span>➕</span> Nova campanha
+      </button>
+      <button class="btn-action" onclick="switchTab('contacts'); document.getElementById('contact-name').focus();">
+        <span>👥</span> Novo contato
+      </button>
+    </div>
+
+    <div class="promo-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+        <h2 style="font-size:1rem; font-weight:700; margin:0; color:#0f172a;">⚡ Promoções em Destaque</h2>
+        <span style="font-size:0.75rem; color:#64748b;" id="active-summary-text">0 ativas</span>
+      </div>
+      <div id="home-campaigns-list" class="item-list">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <div class="promo-card" style="background:#f8fafc; border:1px dashed #cbd5e1;">
+      <h3 style="font-size:0.88rem; font-weight:700; margin:0 0 6px; color:#334155;">💡 Como funciona</h3>
+      <p style="font-size:0.8rem; color:#64748b; margin:0; line-height:1.5;">
+        1. Adicione os e-mails e WhatsApp dos seus clientes em <strong>Contatos</strong>.<br>
+        2. Cadastre itens com preço e desconto em <strong>Campanhas</strong>.<br>
+        3. Vá na aba <strong>Enviar</strong> para disparar e-mails ou mensagens pelo WhatsApp!
+      </p>
+    </div>
+
+    <!-- Cloud Sync Status Card -->
+    <div class="promo-card" id="sync-status-card" style="background:#ffffff; border:1px solid var(--border);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <h3 style="font-size:0.95rem; font-weight:700; margin:0; color:#0f172a;">☁️ Sincronização</h3>
+        <span id="sync-status-badge" style="font-size:0.75rem; font-weight:600; padding:3px 8px; border-radius:999px; background:#f1f5f9; color:#475569;">Verificando...</span>
+      </div>
+      <p id="sync-status-msg" style="font-size:0.82rem; margin:0 0 10px; color:#475569;">
+        Conectando com a planilha Google...
+      </p>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button type="button" id="btn-sync-now" class="btn-action" style="flex:1; min-height:38px; font-size:0.82rem;" onclick="syncNow(true)">
+          🔄 Sincronizar agora
+        </button>
+      </div>
+      <div id="sync-pending-count" style="display:none; font-size:0.75rem; color:#d97706; margin-top:6px; font-weight:600;">
+        ⏳ Itens pendentes de envio: 0
+      </div>
+    </div>
+
+    <div class="promo-card" style="background:#f8fafc; border:1px solid #e2e8f0; font-size:0.8rem; color:#64748b; line-height:1.5;">
+      ☁️ Este app está vinculado à conta lopesautomacao286@gmail.com: contatos e campanhas são salvos na planilha 'Campanhas Lopes Automação' e ficam acessíveis de qualquer aparelho. Funciona também sem internet (os dados ficam neste aparelho e sincronizam quando houver conexão).
+    </div>
+  </main>
+
+  <!-- TAB 2: CONTATOS -->
+  <section id="tab-contacts" class="tab-content" role="tabpanel">
+    <div class="promo-card">
+      <h2 style="font-size:1.05rem; font-weight:700; margin:0 0 12px; color:#0f172a;">👥 Adicionar Contato</h2>
+      <form id="form-contact" onsubmit="handleSaveContact(event)">
+        <div class="form-group">
+          <label for="contact-name">Nome do cliente (opcional)</label>
+          <input type="text" id="contact-name" class="form-control" placeholder="Ex: Maria Oliveira">
+        </div>
+        <div class="form-group">
+          <label for="contact-email">E-mail *</label>
+          <input type="email" id="contact-email" class="form-control" required placeholder="cliente@exemplo.com">
+        </div>
+        <div class="form-group">
+          <label for="contact-whatsapp">WhatsApp (somente números, com DDD)</label>
+          <input type="tel" id="contact-whatsapp" class="form-control" placeholder="(11) 99999-9999 ou 5511999999999" oninput="handleWhatsAppInput(this)">
+        </div>
+        <button type="submit" class="btn-action btn-primary-action" style="width:100%; margin-top:8px;">
+          <span>➕</span> Adicionar contato
+        </button>
+      </form>
+    </div>
+
+    <!-- Import / Export Section -->
+    <div class="promo-card">
+      <details>
+        <summary style="font-size:0.9rem; font-weight:700; cursor:pointer; color:#334155; padding: 4px 0;">
+          📥 Importar contatos em lote
+        </summary>
+        <div style="margin-top:12px;">
+          <p style="font-size:0.78rem; color:#64748b; margin:0 0 6px;">
+            Aceita e-mails soltos, formato <code>Nome &lt;email&gt;</code>, ou colunas separadas por vírgula/ponto-e-vírgula/tab (<code>email;whatsapp</code> ou <code>nome;email;whatsapp</code>):
+          </p>
+          <textarea id="import-text" class="form-control" style="height:95px; resize:vertical; font-size:0.82rem;" placeholder="Maria;maria@exemplo.com;11999998888&#10;cliente@gmail.com;5521988887777&#10;João Silva <joao@empresa.com>"></textarea>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button type="button" class="btn-action btn-primary-action" style="flex:1;" onclick="handleImportContacts()">
+              Importar contatos
+            </button>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <!-- Contacts List -->
+    <div class="promo-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+        <h3 style="font-size:0.95rem; font-weight:700; margin:0; color:#0f172a;">
+          Contatos salvos (<span id="contacts-badge">0</span>)
+        </h3>
+        <button type="button" onclick="exportContactsJSON()" class="btn-action" style="min-height:34px; padding:4px 10px; font-size:0.75rem;">
+          ⬇️ Exportar JSON
+        </button>
+      </div>
+      <div id="contacts-list" class="item-list">
+        <!-- Rendered list -->
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 3: CAMPANHAS -->
+  <section id="tab-campaigns" class="tab-content" role="tabpanel">
+    <div class="promo-card">
+      <h2 id="campaign-form-title" style="font-size:1.05rem; font-weight:700; margin:0 0 12px; color:#0f172a;">🏷️ Nova Campanha</h2>
+      <form id="form-campaign" onsubmit="handleSaveCampaign(event)">
+        <input type="hidden" id="campaign-edit-id" value="">
+
+        <div class="form-group">
+          <label for="camp-name">Nome do item / produto *</label>
+          <input type="text" id="camp-name" class="form-control" required placeholder="Ex.: Inversor de frequência WEG" oninput="updateLivePreview()">
+        </div>
+
+        <div class="form-group">
+          <label for="camp-photo">Foto do item</label>
+          <input type="file" id="camp-photo" class="form-control" accept="image/*" onchange="handleImageUpload(event)" style="padding-top:7px;">
+          <input type="hidden" id="camp-photo-data" value="">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="camp-original-price">Preço normal (R$) *</label>
+            <input type="number" step="0.01" min="0.01" id="camp-original-price" class="form-control" required placeholder="980.00" oninput="updateLivePreview()">
+          </div>
+          <div class="form-group">
+            <label for="camp-promo-price">Preço promocional (R$) *</label>
+            <input type="number" step="0.01" min="0.01" id="camp-promo-price" class="form-control" required placeholder="799.00" oninput="updateLivePreview()">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="camp-discount">Desconto calculado</label>
+            <input type="text" id="camp-discount" class="form-control" readonly value="0%" style="background:#f1f5f9; font-weight:700; color:var(--accent-text);">
+          </div>
+          <div class="form-group">
+            <label for="camp-expiry">Validade da promoção *</label>
+            <input type="date" id="camp-expiry" class="form-control" required oninput="updateLivePreview()">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="camp-obs">Observação curta (opcional)</label>
+          <input type="text" id="camp-obs" class="form-control" placeholder="Ex: Pronta entrega, garantia de fábrica" oninput="updateLivePreview()">
+        </div>
+
+        <!-- Live Preview Box -->
+        <div class="preview-box">
+          <span class="preview-badge">Pré-visualização em tempo real</span>
+          <div class="promo-flyer">
+            <div class="promo-flyer-img" id="preview-img-container">
+              <span class="no-img">📦</span>
+              <div class="discount-tag" id="preview-discount-tag">−0%</div>
+            </div>
+            <div class="promo-flyer-body">
+              <div class="promo-flyer-title" id="preview-title">Nome do Produto</div>
+              <div class="promo-prices">
+                <span class="price-original" id="preview-original">R$ 0,00</span>
+                <span class="price-promo" id="preview-promo">R$ 0,00</span>
+              </div>
+              <div class="promo-validity" id="preview-validity">
+                ⏰ Válido até: DD/MM/AAAA
+              </div>
+              <div id="preview-obs" style="font-size:0.75rem; color:#64748b; margin-top:4px; font-style:italic;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button type="button" id="btn-cancel-edit" class="btn-action" style="display:none; flex:1;" onclick="cancelCampaignEdit()">
+            Cancelar
+          </button>
+          <button type="submit" id="btn-save-camp" class="btn-action btn-primary-action" style="flex:2;">
+            💾 Salvar campanha
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Campaigns List -->
+    <div class="promo-card">
+      <h3 style="font-size:0.95rem; font-weight:700; margin:0 0 10px; color:#0f172a;">
+        Campanhas salvas (<span id="campaigns-badge">0</span>)
+      </h3>
+      <div id="campaigns-list" class="item-list">
+        <!-- Rendered list -->
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 4: ENVIAR -->
+  <section id="tab-send" class="tab-content" role="tabpanel">
+    <div class="promo-card">
+      <h2 style="font-size:1.05rem; font-weight:700; margin:0 0 12px; color:#0f172a;">📧 Enviar Campanha</h2>
+
+      <div class="form-group">
+        <label for="send-campaign-select">Campanha a promover *</label>
+        <select id="send-campaign-select" class="form-control" onchange="updateSendTabMessage()">
+          <option value="">Selecione uma campanha...</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 4px;">
+          <label style="margin:0;">Destinatários de E-mail (<span id="recipients-count">0</span> selecionados)</label>
+          <button type="button" onclick="toggleAllRecipients()" class="btn-action" style="min-height:30px; font-size:0.72rem; padding:2px 8px; border:none; background:transparent; color:var(--accent-text);">
+            Marcar/Desmarcar todos
+          </button>
+        </div>
+        <div class="recipients-box" id="recipients-list">
+          <!-- Checkboxes rendered here -->
+        </div>
+      </div>
+    </div>
+
+    <div id="email-result-card" class="promo-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+        <h3 style="font-size:0.95rem; font-weight:700; margin:0; color:#0f172a;">📬 Mensagem da Campanha</h3>
+        <button type="button" id="btn-reset-msg" class="btn-action" style="min-height:30px; padding:2px 8px; font-size:0.74rem; border:1px solid #cbd5e1; background:#f8fafc; color:#475569;" onclick="resetCustomMessage()" title="Restaurar texto padrão da campanha">
+          ↩️ Restaurar padrão
+        </button>
+      </div>
+      
+      <div style="margin-bottom:10px;">
+        <span style="font-size:0.75rem; font-weight:700; color:#475569;">Assunto do e-mail:</span>
+        <div id="email-subject-text" style="font-weight:600; font-size:0.88rem; color:#0f172a; padding:6px 10px; background:#f1f5f9; border-radius:6px; margin-top:3px; word-break:break-word;">
+          -
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:12px;">
+        <label for="send-message-text" style="font-size:0.75rem; font-weight:700; color:#475569; display:block; margin-bottom:4px;">
+          Corpo da mensagem (editável):
+        </label>
+        <textarea id="send-message-text" class="form-control" style="min-height:220px; font-size:0.86rem; line-height:1.5; resize:vertical; font-family:inherit; white-space:pre-wrap;" placeholder="Escreva ou edite a mensagem..." oninput="onCustomMessageInput(this.value)"></textarea>
+      </div>
+
+      <div style="font-size:0.73rem; color:#64748b; margin-top:-6px; margin-bottom:12px; font-style:italic;">
+        ℹ️ O texto é salvo automaticamente neste aparelho (por campanha).
+      </div>
+
+      <button type="button" class="btn-action" style="width:100%; margin-bottom:10px;" onclick="copyCurrentMessage()">
+        📋 Copiar mensagem
+      </button>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:6px;">
+        <button type="button" class="btn-action btn-primary-action" style="min-height:44px; font-size:0.86rem;" onclick="openEmailClient()">
+          📧 Enviar via e-mail
+        </button>
+        <button type="button" class="btn-action" style="min-height:44px; font-size:0.86rem; background:#059669; color:#ffffff; border-color:#059669;" onclick="openWhatsAppModal()">
+          📱 Enviar via WhatsApp
+        </button>
+      </div>
+      <div style="font-size:0.74rem; color:#64748b; text-align:center; margin-top:6px; line-height:1.4;">
+        O WhatsApp envia para um contato por vez com a mensagem acima.
+      </div>
+    </div>
+
+    <!-- Modal Escolha o Destinatário do WhatsApp -->
+    <div id="wa-modal" class="modal-overlay" onclick="handleWaModalOverlayClick(event)" role="dialog" aria-modal="true" aria-labelledby="wa-modal-title">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h3 id="wa-modal-title" style="margin:0; font-size:1.05rem; font-weight:700; color:#0f172a;">Escolha o destinatário</h3>
+          <button type="button" class="modal-close-btn" onclick="closeWhatsAppModal()" aria-label="Fechar">✕</button>
+        </div>
+        <div class="modal-body" id="wa-modal-list">
+          <!-- Contatos com WhatsApp inseridos dinamicamente -->
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      💡 <em>O envio usa o app de e-mail nativo do celular e o WhatsApp — o app não depende de servidor para enviar.</em>
+    </div>
+  </section>
+
+  <!-- BOTTOM FIXED NAVIGATION -->
+  <nav class="bottom-nav" aria-label="Navegação principal">
+    <button class="nav-btn active" onclick="switchTab('home')" id="nav-btn-home">
+      <span class="nav-icon">📊</span>
+      <span>Início</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('contacts')" id="nav-btn-contacts">
+      <span class="nav-icon">👥</span>
+      <span>Contatos</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('campaigns')" id="nav-btn-campaigns">
+      <span class="nav-icon">🏷️</span>
+      <span>Campanhas</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('send')" id="nav-btn-send">
+      <span class="nav-icon">📧</span>
+      <span>Enviar</span>
+    </button>
+  </nav>
+</div>
+
+<script>
+// CLOUD API URL
+const API_URL = 'https://script.google.com/macros/s/AKfycbweNXYcFlBN6Q4LPENrWbTnNMHpJYurC2QTSNlKfbUR51s8i1to6IAVKb5__w4I8ymv/exec';
+
+// STORAGE KEYS
+const STORAGE_CONTACTS = 'promo_contacts';
+const STORAGE_CAMPAIGNS = 'promo_campaigns';
+const STORAGE_PENDING = 'promo_pending';
+const STORAGE_CUSTOM_MESSAGES = 'promo_custom_messages';
+
+// INITIAL NEUTRAL STATE (NO SAMPLE/MOCK DATA)
+const DEFAULT_CONTACTS = [];
+const DEFAULT_CAMPAIGNS = [];
+
+function getFutureDate(daysAhead) {
+  const d = new Date();
+  d.setDate(d.getDate() + daysAhead);
+  return d.toISOString().split('T')[0];
+}
+
+// APP STATE
+let contacts = [];
+let campaigns = [];
+let isCloudConnected = false;
+let isSyncing = false;
+let selectedRecipientEmails = new Set();
+let currentGeneratedSubject = '';
+let currentGeneratedBody = '';
+
+// PENDING SYNC QUEUE HELPERS
+let autoSyncTimer = null;
+let isProcessingQueue = false;
+
+function getPendingQueue() {
+  try {
+    const raw = localStorage.getItem(STORAGE_PENDING);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function savePendingQueue(queue) {
+  try {
+    localStorage.setItem(STORAGE_PENDING, JSON.stringify(queue));
+  } catch (e) {
+    console.error('Falha ao salvar fila pendente', e);
+  }
+}
+
+function enqueuePendingAction(actionPayload) {
+  const queue = getPendingQueue();
+  queue.push({
+    ...actionPayload,
+    queuedAt: new Date().toISOString()
+  });
+  savePendingQueue(queue);
+  updateSyncUI();
+  scheduleQueueSync(3000);
+}
+
+function scheduleQueueSync(delayMs = 3000) {
+  if (autoSyncTimer) {
+    clearTimeout(autoSyncTimer);
+    autoSyncTimer = null;
+  }
+  const queue = getPendingQueue();
+  if (queue.length === 0) return;
+
+  autoSyncTimer = setTimeout(() => {
+    processQueue();
+  }, delayMs);
+}
+
+async function processQueue() {
+  if (isProcessingQueue || isSyncing) {
+    scheduleQueueSync(5000);
+    return;
+  }
+
+  const queue = getPendingQueue();
+  if (queue.length === 0) {
+    updateSyncUI();
+    return;
+  }
+
+  isProcessingQueue = true;
+  updateSyncUI();
+
+  try {
+    const allCleared = await flushPendingQueue();
+    if (allCleared) {
+      isCloudConnected = true;
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      lastSyncTimeStr = `${hh}:${mm}`;
+
+      await fetchCloudDataWithRetry(1, 1500);
+      reRenderAllTabs();
+      updateSyncUI();
+      showToast('Itens pendentes sincronizados com a nuvem!', '✔️');
+    } else {
+      updateSyncUI();
+      scheduleQueueSync(10000);
+    }
+  } catch (err) {
+    updateSyncUI();
+    scheduleQueueSync(10000);
+  } finally {
+    isProcessingQueue = false;
+  }
+}
+
+let lastSyncTimeStr = '';
+
+function updateSyncUI(statusOverride) {
+  const badge = document.getElementById('sync-status-badge');
+  const msg = document.getElementById('sync-status-msg');
+  const pendingEl = document.getElementById('sync-pending-count');
+  const queue = getPendingQueue();
+
+  if (queue.length > 0) {
+    if (pendingEl) {
+      pendingEl.style.display = 'block';
+      pendingEl.textContent = `⏳ ${queue.length} item(ns) aguardando sincronização`;
+    }
+  } else if (pendingEl) {
+    pendingEl.style.display = 'none';
+  }
+
+  if (statusOverride === 'syncing' || isSyncing) {
+    if (badge) {
+      badge.style.background = '#e0f2fe';
+      badge.style.color = '#0369a1';
+      badge.textContent = 'Sincronizando…';
+    }
+    if (msg) {
+      msg.innerHTML = '<span style="color:#0369a1; font-weight:600;">Sincronizando…</span>';
+    }
+    return;
+  }
+
+  if (queue.length > 0) {
+    if (badge) {
+      badge.style.background = '#fef3c7';
+      badge.style.color = '#b45309';
+      badge.textContent = 'Pendente';
+    }
+    if (msg) {
+      const itemLabel = queue.length === 1 ? 'item aguardando' : 'itens aguardando';
+      msg.innerHTML = `<span style="color:#b45309; font-weight:600;">Pendências: ${queue.length} ${itemLabel} — tentando novamente…</span>`;
+    }
+    return;
+  }
+
+  if (isCloudConnected) {
+    if (badge) {
+      badge.style.background = '#dcfce7';
+      badge.style.color = '#15803d';
+      badge.textContent = 'Sincronizado';
+    }
+    if (msg) {
+      const timeInfo = lastSyncTimeStr ? ` (às ${lastSyncTimeStr})` : '';
+      msg.innerHTML = `<span style="color:#15803d; font-weight:600;">✓ Sincronizado — dados da nuvem${timeInfo}</span>`;
+    }
+  } else {
+    if (badge) {
+      badge.style.background = '#fef3c7';
+      badge.style.color = '#b45309';
+      badge.textContent = 'Sem conexão';
+    }
+    if (msg) {
+      msg.innerHTML = '<span style="color:#b45309; font-weight:600;">Sem conexão — dados deste aparelho</span>';
+    }
+  }
+}
+
+// POST HELPER WITH AUTOMATIC RETRIES BEFORE ENQUEUEING
+async function sendCloudAction(payload, maxAttempts = 3, retryDelayMs = 2000) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json().catch(() => ({ ok: true }));
+
+      if (data && data.ok) {
+        isCloudConnected = true;
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        lastSyncTimeStr = `${hh}:${mm}`;
+        updateSyncUI();
+        return true;
+      } else {
+        throw new Error(data && data.error ? data.error : 'Erro na API');
+      }
+    } catch (err) {
+      if (attempt < maxAttempts) {
+        await new Promise(r => setTimeout(r, retryDelayMs));
+      }
+    }
+  }
+
+  // Se todas as 3 tentativas falharem, enfileira e agenda retentativas automáticas
+  isCloudConnected = false;
+  enqueuePendingAction(payload);
+  updateSyncUI();
+  return false;
+}
+
+// WHATSAPP HELPERS
+function handleWhatsAppInput(el) {
+  // Allow only digits
+  el.value = el.value.replace(/\D/g, '');
+}
+
+function normalizeWhatsAppNumber(raw) {
+  if (!raw) return '';
+  const digits = String(raw).replace(/\D/g, '');
+  if (!digits) return '';
+  // 10 digits (DDD + 8 digits) or 11 digits (DDD + 9 digits) -> prepend 55 (Brazil)
+  if (digits.length === 10 || digits.length === 11) {
+    return '55' + digits;
+  }
+  return digits;
+}
+
+function formatWhatsAppDisplay(phone) {
+  if (!phone) return '';
+  const digits = String(phone).replace(/\D/g, '');
+  if (digits.length === 13 && digits.startsWith('55')) {
+    return `+55 (${digits.slice(2, 4)}) ${digits.slice(4, 9)}-${digits.slice(9)}`;
+  }
+  if (digits.length === 12 && digits.startsWith('55')) {
+    return `+55 (${digits.slice(2, 4)}) ${digits.slice(4, 8)}-${digits.slice(8)}`;
+  }
+  if (digits.length === 11) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  }
+  return `+${digits}`;
+}
+
+// FORMATTERS
+function formatBRL(val) {
+  const num = parseFloat(val) || 0;
+  return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function formatDateBR(dateStr) {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  }
+  return dateStr;
+}
+
+function isCampaignActive(expiryDate) {
+  if (!expiryDate) return false;
+  const today = new Date().toISOString().split('T')[0];
+  return expiryDate >= today;
+}
+
+// TOAST HELPER
+function showToast(msg, icon = '✓') {
+  const toast = document.getElementById('toast');
+  const toastMsg = document.getElementById('toast-msg');
+  const toastIcon = document.getElementById('toast-icon');
+  toastMsg.textContent = msg;
+  toastIcon.textContent = icon;
+  toast.classList.add('show');
+  clearTimeout(window._toastTimeout);
+  window._toastTimeout = setTimeout(() => {
+    toast.classList.remove('show');
+  }, 2800);
+}
+
+// TAB SWITCHING
+function switchTab(tabId) {
+  const tabs = ['home', 'contacts', 'campaigns', 'send'];
+  tabs.forEach(t => {
+    const el = document.getElementById(`tab-${t}`);
+    const navBtn = document.getElementById(`nav-btn-${t}`);
+    if (t === tabId) {
+      el.classList.add('active');
+      navBtn.classList.add('active');
+    } else {
+      el.classList.remove('active');
+      navBtn.classList.remove('active');
+    }
+  });
+
+  if (tabId === 'home') renderDashboard();
+  if (tabId === 'contacts') renderContactsList();
+  if (tabId === 'campaigns') renderCampaignsList();
+  if (tabId === 'send') prepareSendTab();
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// DATA NORMALIZATION HELPERS
+function parseNumField(val) {
+  if (typeof val === 'number') return val;
+  if (!val) return 0;
+  const cleaned = String(val).replace(/[^\d,.-]/g, '').replace(',', '.');
+  const num = parseFloat(cleaned);
+  return isNaN(num) ? 0 : num;
+}
+
+function normalizeDateString(val) {
+  if (!val) return '';
+  const s = String(val).trim();
+  // If DD/MM/YYYY
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) {
+    const [d, m, y] = s.split('/');
+    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+  }
+  // If ISO full string like 2025-05-10T...
+  if (s.includes('T')) {
+    return s.split('T')[0];
+  }
+  return s;
+}
+
+function normalizeCloudContacts(rawList) {
+  if (!Array.isArray(rawList)) return [];
+  return rawList
+    .map((item, idx) => {
+      const email = String(item['E-mail'] || item.email || '').trim().toLowerCase();
+      if (!email) return null;
+      const nome = String(item['Nome'] || item.nome || item.name || '').trim();
+      const rawWa = item['WhatsApp'] || item.whatsapp || '';
+      const whatsapp = normalizeWhatsAppNumber(rawWa);
+      const rawDate = item['Data de cadastro'] || item.createdAt || '';
+      const createdAt = normalizeDateString(rawDate) || new Date().toISOString().split('T')[0];
+
+      return {
+        id: 'c_cloud_' + (email.replace(/[^a-zA-Z0-9]/g, '_') || idx),
+        name: nome,
+        email: email,
+        whatsapp: whatsapp,
+        createdAt: createdAt
+      };
+    })
+    .filter(Boolean);
+}
+
+function normalizeCloudCampaigns(rawList) {
+  if (!Array.isArray(rawList)) return [];
+  return rawList
+    .map((item, idx) => {
+      const nome = String(item['Nome do item'] || item.nome || item.name || '').trim();
+      if (!nome) return null;
+
+      const precoNormal = parseNumField(item['Preço normal'] || item.precoNormal || item.originalPrice);
+      const precoPromo = parseNumField(item['Preço promocional'] || item.precoPromo || item.promoPrice);
+      let desconto = parseNumField(item['Desconto %'] || item.desconto || item.discountPct);
+      if (!desconto && precoNormal > 0 && precoPromo > 0) {
+        desconto = calculateDiscount(precoNormal, precoPromo);
+      }
+      const rawValidade = item['Validade'] || item.validade || item.expiryDate || '';
+      const validade = normalizeDateString(rawValidade) || getFutureDate(7);
+      const obs = String(item['Observação'] || item.obs || item.observation || '').trim();
+      const foto = String(item['Foto'] || item.foto || item.photo || '').trim();
+
+      return {
+        id: 'camp_cloud_' + idx + '_' + Date.now(),
+        name: nome,
+        originalPrice: precoNormal,
+        promoPrice: precoPromo,
+        discountPct: Math.round(desconto),
+        expiryDate: validade,
+        observation: obs,
+        photo: foto
+      };
+    })
+    .filter(Boolean);
+}
+
+// DATA INITIALIZATION & LOCALSTORAGE
+function loadData() {
+  try {
+    const rawC = localStorage.getItem(STORAGE_CONTACTS);
+    contacts = rawC ? JSON.parse(rawC) : [];
+  } catch (e) {
+    contacts = [];
+  }
+
+  try {
+    const rawCamp = localStorage.getItem(STORAGE_CAMPAIGNS);
+    campaigns = rawCamp ? JSON.parse(rawCamp) : [];
+  } catch (e) {
+    campaigns = [];
+  }
+}
+
+function saveContactsToStorage() {
+  localStorage.setItem(STORAGE_CONTACTS, JSON.stringify(contacts));
+}
+
+function saveCampaignsToStorage() {
+  localStorage.setItem(STORAGE_CAMPAIGNS, JSON.stringify(campaigns));
+}
+
+// RE-RENDER ALL TABS
+function reRenderAllTabs() {
+  renderDashboard();
+  renderContactsList();
+  renderCampaignsList();
+  prepareSendTab();
+}
+
+// CLOUD FETCH WITH RETRY
+async function fetchCloudDataWithRetry(retries = 2, delayMs = 2000) {
+  let attempt = 0;
+  while (attempt <= retries) {
+    try {
+      const url = `${API_URL}?t=${Date.now()}`;
+      const res = await fetch(url, {
+        method: 'GET',
+        redirect: 'follow',
+        cache: 'no-store'
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (data && data.ok) {
+        // Replace local contacts and campaigns with cloud data
+        const parsedContacts = Array.isArray(data.contacts) ? normalizeCloudContacts(data.contacts) : [];
+        const parsedCampaigns = Array.isArray(data.campaigns) ? normalizeCloudCampaigns(data.campaigns) : [];
+
+        contacts = parsedContacts;
+        campaigns = parsedCampaigns;
+        saveContactsToStorage();
+        saveCampaignsToStorage();
+
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        lastSyncTimeStr = `${hh}:${mm}`;
+
+        isCloudConnected = true;
+        return true;
+      } else {
+        throw new Error(data && data.error ? data.error : 'Resposta inválida');
+      }
+    } catch (err) {
+      attempt++;
+      if (attempt <= retries) {
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+  }
+  isCloudConnected = false;
+  return false;
+}
+
+async function flushPendingQueue() {
+  let queue = getPendingQueue();
+  if (queue.length === 0) return true;
+
+  const remaining = [];
+  for (const item of queue) {
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(item)
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json().catch(() => ({ ok: true }));
+      if (data && data.ok) {
+        // Sucesso no item
+      } else {
+        remaining.push(item);
+      }
+    } catch (e) {
+      remaining.push(item);
+    }
+  }
+
+  savePendingQueue(remaining);
+  return remaining.length === 0;
+}
+
+async function syncNow(userTriggered = false) {
+  if (isSyncing) return;
+  isSyncing = true;
+  if (autoSyncTimer) {
+    clearTimeout(autoSyncTimer);
+    autoSyncTimer = null;
+  }
+  updateSyncUI('syncing');
+
+  const syncBtn = document.getElementById('btn-sync-now');
+  if (syncBtn) {
+    syncBtn.disabled = true;
+    syncBtn.innerHTML = '🔄 Sincronizando...';
+  }
+
+  try {
+    const queue = getPendingQueue();
+    if (queue.length > 0) {
+      await flushPendingQueue();
+    }
+
+    const success = await fetchCloudDataWithRetry(2, 2000);
+    if (success) {
+      reRenderAllTabs();
+      updateSyncUI();
+      if (userTriggered) {
+        showToast('Sincronização concluída com sucesso!', '✔️');
+      }
+    } else {
+      updateSyncUI();
+      if (userTriggered) {
+        showToast('Sem conexão — usando dados deste aparelho.', '📴');
+      }
+    }
+  } catch (err) {
+    updateSyncUI();
+    if (userTriggered) {
+      showToast('Sem conexão — usando dados deste aparelho.', '📴');
+    }
+  } finally {
+    isSyncing = false;
+    if (syncBtn) {
+      syncBtn.disabled = false;
+      syncBtn.innerHTML = '🔄 Sincronizar agora';
+    }
+    if (getPendingQueue().length > 0) {
+      scheduleQueueSync(10000);
+    }
+  }
+}
+
+// DASHBOARD
+function renderDashboard() {
+  const contactsCount = contacts.length;
+  const campCount = campaigns.length;
+  const activeCamps = campaigns.filter(c => isCampaignActive(c.expiryDate));
+
+  document.getElementById('dash-contacts-count').textContent = contactsCount;
+  document.getElementById('dash-campaigns-count').textContent = campCount;
+  document.getElementById('dash-active-count').textContent = activeCamps.length;
+  document.getElementById('active-summary-text').textContent = `${activeCamps.length} ativa(s)`;
+
+  const container = document.getElementById('home-campaigns-list');
+  if (activeCamps.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center; padding: 24px 10px; color:#94a3b8; font-size:0.88rem;">
+        Nenhuma campanha criada ainda.<br>
+        <button class="btn-action btn-primary-action" style="margin: 10px auto 0; font-size:0.82rem; min-height:36px;" onclick="switchTab('campaigns'); openNewCampaignForm();">
+          ➕ Criar campanha
+        </button>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = activeCamps.map(camp => `
+    <div class="campaign-card">
+      <div class="campaign-thumb">
+        ${camp.photo ? `<img src="${camp.photo}" alt="${escapeHtml(camp.name)}">` : '<span style="font-size:1.4rem;">🏷️</span>'}
+      </div>
+      <div class="item-details">
+        <div class="item-name">${escapeHtml(camp.name)}</div>
+        <div class="item-sub">
+          <strong style="color:var(--accent-text); font-size:0.9rem;">${formatBRL(camp.promoPrice)}</strong>
+          <span style="text-decoration:line-through; margin-left:4px; font-size:0.75rem;">${formatBRL(camp.originalPrice)}</span>
+          <span style="background:var(--accent); color:#fff; font-size:0.65rem; font-weight:700; padding:1px 5px; border-radius:4px; margin-left:4px;">-${camp.discountPct}%</span>
+        </div>
+        <div style="font-size:0.72rem; color:#64748b; margin-top:2px;">
+          ⏰ Até ${formatDateBR(camp.expiryDate)}
+        </div>
+      </div>
+      <button class="btn-action" style="min-height:36px; padding:4px 8px; font-size:0.75rem;" onclick="quickSend('${camp.id}')">
+        Enviar ✉️
+      </button>
+    </div>
+  `).join('');
+}
+
+function quickSend(campId) {
+  switchTab('send');
+  const select = document.getElementById('send-campaign-select');
+  select.value = campId;
+  updateSendTabMessage();
+}
+
+// CONTACTS MANAGEMENT
+function renderContactsList() {
+  const list = document.getElementById('contacts-list');
+  const countBadge = document.getElementById('contacts-badge');
+  countBadge.textContent = contacts.length;
+
+  if (contacts.length === 0) {
+    list.innerHTML = `<div style="text-align:center; color:#94a3b8; padding:16px; font-size:0.85rem;">Nenhum contato cadastrado ainda.</div>`;
+    return;
+  }
+
+  list.innerHTML = contacts.map(c => `
+    <div class="contact-card">
+      <div class="item-details">
+        <div class="item-name">${escapeHtml(c.name || 'Sem nome')}</div>
+        <div class="item-sub" style="color:#0f172a; font-weight:500;">${escapeHtml(c.email)}</div>
+        ${c.whatsapp ? `<div style="font-size:0.76rem; color:#047857; margin-top:2px; font-weight:600;">📱 ${escapeHtml(formatWhatsAppDisplay(c.whatsapp))}</div>` : ''}
+        <div style="font-size:0.7rem; color:#94a3b8; margin-top:2px;">Cadastrado em: ${formatDateBR(c.createdAt)}</div>
+      </div>
+      <button class="btn-icon-del" title="Excluir contato" onclick="deleteContact('${c.id}')" aria-label="Excluir">
+        🗑️
+      </button>
+    </div>
+  `).join('');
+}
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+async function handleSaveContact(e) {
+  e.preventDefault();
+  const nameInput = document.getElementById('contact-name');
+  const emailInput = document.getElementById('contact-email');
+  const waInput = document.getElementById('contact-whatsapp');
+
+  const name = nameInput.value.trim();
+  const email = emailInput.value.trim().toLowerCase();
+  const rawWa = waInput.value.trim();
+  const normalizedWa = normalizeWhatsAppNumber(rawWa);
+
+  if (!email || !isValidEmail(email)) {
+    showToast('Informe um e-mail válido.', '⚠️');
+    return;
+  }
+
+  const exists = contacts.some(c => c.email.toLowerCase() === email);
+  if (exists) {
+    showToast('Este e-mail já está cadastrado.', '⚠️');
+    return;
+  }
+
+  const newContact = {
+    id: 'c_' + Date.now() + Math.random().toString(36).substr(2, 4),
+    name: name,
+    email: email,
+    whatsapp: normalizedWa,
+    createdAt: new Date().toISOString().split('T')[0]
+  };
+
+  contacts.unshift(newContact);
+  saveContactsToStorage();
+  nameInput.value = '';
+  emailInput.value = '';
+  waInput.value = '';
+  renderContactsList();
+
+  // Cloud sync
+  const payload = {
+    action: 'addContact',
+    nome: name,
+    email: email,
+    whatsapp: normalizedWa
+  };
+
+  const cloudSuccess = await sendCloudAction(payload);
+  if (cloudSuccess) {
+    showToast('✔️ Salvo na nuvem');
+  } else {
+    showToast('📴 Sem conexão — salvo neste aparelho, sincroniza automaticamente');
+  }
+}
+
+async function deleteContact(id) {
+  const contact = contacts.find(c => c.id === id);
+  if (!contact) return;
+  if (!confirm(`Deseja realmente excluir o contato ${contact.email}?`)) return;
+
+  const targetEmail = contact.email;
+  contacts = contacts.filter(c => c.id !== id);
+  saveContactsToStorage();
+  renderContactsList();
+
+  // Cloud sync
+  const payload = {
+    action: 'deleteContact',
+    email: targetEmail
+  };
+
+  const cloudSuccess = await sendCloudAction(payload);
+  if (cloudSuccess) {
+    showToast('Contato excluído da nuvem.');
+  } else {
+    showToast('Contato excluído localmente (pendente na nuvem).');
+  }
+}
+
+function handleImportContacts() {
+  const rawText = document.getElementById('import-text').value;
+  if (!rawText.trim()) {
+    showToast('Cole contatos para importar.', '⚠️');
+    return;
+  }
+
+  const lines = rawText.split(/[\r\n]+/).map(l => l.trim()).filter(Boolean);
+  let importedCount = 0;
+  let ignoredCount = 0;
+  const today = new Date().toISOString().split('T')[0];
+
+  lines.forEach(line => {
+    // Check for delimiter: tab, semicolon or comma
+    let delimiter = null;
+    if (line.includes('\t')) delimiter = '\t';
+    else if (line.includes(';')) delimiter = ';';
+    else if (line.includes(',')) {
+      // If line contains '<' and '>', it might be "Name <email>" without fields delimiter
+      if (!line.includes('<') || (line.split(',').length > 1 && line.includes('@'))) {
+        delimiter = ',';
+      }
+    }
+
+    if (delimiter) {
+      const parts = line.split(delimiter).map(p => p.trim());
+      // Case: multiple loose emails in single line separated by comma or semicolon
+      const allLookLikeEmails = parts.length > 1 && parts.every(p => isValidEmail(p.toLowerCase()));
+      if (allLookLikeEmails) {
+        parts.forEach(em => {
+          const emailLower = em.toLowerCase();
+          if (contacts.some(c => c.email.toLowerCase() === emailLower)) {
+            ignoredCount++;
+          } else {
+            contacts.push({
+              id: 'c_' + Date.now() + Math.random().toString(36).substr(2, 4),
+              name: '',
+              email: emailLower,
+              whatsapp: '',
+              createdAt: today
+            });
+            importedCount++;
+          }
+        });
+        return;
+      }
+
+      let name = '';
+      let email = '';
+      let whatsapp = '';
+
+      if (parts.length === 2) {
+        // format: "email;whatsapp"
+        if (isValidEmail(parts[0].toLowerCase())) {
+          email = parts[0].toLowerCase();
+          whatsapp = normalizeWhatsAppNumber(parts[1]);
+        } else if (isValidEmail(parts[1].toLowerCase())) {
+          name = parts[0];
+          email = parts[1].toLowerCase();
+        }
+      } else if (parts.length >= 3) {
+        // format: "nome;email;whatsapp"
+        name = parts[0];
+        email = parts[1].toLowerCase();
+        whatsapp = normalizeWhatsAppNumber(parts[2]);
+      }
+
+      if (!isValidEmail(email) || contacts.some(c => c.email.toLowerCase() === email)) {
+        ignoredCount++;
+        return;
+      }
+
+      contacts.push({
+        id: 'c_' + Date.now() + Math.random().toString(36).substr(2, 4),
+        name: name,
+        email: email,
+        whatsapp: whatsapp,
+        createdAt: today
+      });
+      importedCount++;
+    } else {
+      // Single item: could be "Nome <email>" or plain email
+      let email = line;
+      let name = '';
+      const angleMatch = line.match(/<([^>]+)>/);
+      if (angleMatch) {
+        email = angleMatch[1].trim();
+        name = line.replace(/<[^>]+>/, '').trim();
+      }
+      email = email.toLowerCase();
+
+      if (!isValidEmail(email) || contacts.some(c => c.email.toLowerCase() === email)) {
+        ignoredCount++;
+        return;
+      }
+
+      contacts.push({
+        id: 'c_' + Date.now() + Math.random().toString(36).substr(2, 4),
+        name: name || '',
+        email: email,
+        whatsapp: '',
+        createdAt: today
+      });
+      importedCount++;
+    }
+  });
+
+  saveContactsToStorage();
+  document.getElementById('import-text').value = '';
+  renderContactsList();
+  showToast(`${importedCount} importado(s), ${ignoredCount} ignorado(s).`);
+}
+
+function exportContactsJSON() {
+  if (contacts.length === 0) {
+    showToast('Nenhum contato para exportar.', '⚠️');
+    return;
+  }
+  const cleanContacts = contacts.map(c => ({
+    id: c.id,
+    name: c.name || '',
+    email: c.email,
+    whatsapp: c.whatsapp || '',
+    createdAt: c.createdAt
+  }));
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(cleanContacts, null, 2));
+  const dlAnchorElem = document.createElement('a');
+  dlAnchorElem.setAttribute("href", dataStr);
+  dlAnchorElem.setAttribute("download", `contatos_promocao_${new Date().toISOString().split('T')[0]}.json`);
+  dlAnchorElem.click();
+  showToast('Download do JSON iniciado!');
+}
+
+// CAMPAIGN MANAGEMENT
+function calculateDiscount(orig, promo) {
+  const o = parseFloat(orig) || 0;
+  const p = parseFloat(promo) || 0;
+  if (o <= 0 || p >= o) return 0;
+  return Math.round(((o - p) / o) * 100);
+}
+
+function handleImageUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  if (file.size > 2 * 1024 * 1024) {
+    showToast('A imagem deve ter menos de 2MB.', '⚠️');
+    e.target.value = '';
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    document.getElementById('camp-photo-data').value = evt.target.result;
+    updateLivePreview();
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateLivePreview() {
+  const name = document.getElementById('camp-name').value.trim() || 'Inversor de Frequência WEG';
+  const origPrice = parseFloat(document.getElementById('camp-original-price').value) || 0;
+  const promoPrice = parseFloat(document.getElementById('camp-promo-price').value) || 0;
+  const expiry = document.getElementById('camp-expiry').value;
+  const obs = document.getElementById('camp-obs').value.trim();
+  const photoData = document.getElementById('camp-photo-data').value;
+
+  const discount = calculateDiscount(origPrice, promoPrice);
+  document.getElementById('camp-discount').value = discount > 0 ? `${discount}%` : '0%';
+
+  // Update Preview Elements
+  document.getElementById('preview-title').textContent = name;
+  document.getElementById('preview-original').textContent = formatBRL(origPrice);
+  document.getElementById('preview-promo').textContent = formatBRL(promoPrice);
+  document.getElementById('preview-discount-tag').textContent = `−${discount}%`;
+  document.getElementById('preview-validity').textContent = expiry ? `⏰ Válido até: ${formatDateBR(expiry)}` : '⏰ Válido até: DD/MM/AAAA';
+  document.getElementById('preview-obs').textContent = obs ? `"${obs}"` : '';
+
+  const imgContainer = document.getElementById('preview-img-container');
+  if (photoData) {
+    imgContainer.innerHTML = `<img src="${photoData}" alt="Pré-visualização"><div class="discount-tag" id="preview-discount-tag">−${discount}%</div>`;
+  } else {
+    imgContainer.innerHTML = `<span class="no-img">📦</span><div class="discount-tag" id="preview-discount-tag">−${discount}%</div>`;
+  }
+}
+
+function openNewCampaignForm() {
+  document.getElementById('form-campaign').reset();
+  document.getElementById('campaign-edit-id').value = '';
+  document.getElementById('camp-photo-data').value = '';
+  document.getElementById('campaign-form-title').textContent = '🏷️ Nova Campanha';
+  document.getElementById('btn-save-camp').innerHTML = '💾 Salvar campanha';
+  document.getElementById('btn-cancel-edit').style.display = 'none';
+
+  // default date 7 days ahead
+  document.getElementById('camp-expiry').value = getFutureDate(7);
+  updateLivePreview();
+}
+
+function cancelCampaignEdit() {
+  openNewCampaignForm();
+}
+
+function editCampaign(id) {
+  const camp = campaigns.find(c => c.id === id);
+  if (!camp) return;
+
+  document.getElementById('campaign-edit-id').value = camp.id;
+  document.getElementById('camp-name').value = camp.name;
+  document.getElementById('camp-original-price').value = camp.originalPrice;
+  document.getElementById('camp-promo-price').value = camp.promoPrice;
+  document.getElementById('camp-expiry').value = camp.expiryDate;
+  document.getElementById('camp-obs').value = camp.observation || '';
+  document.getElementById('camp-photo-data').value = camp.photo || '';
+  document.getElementById('camp-photo').value = '';
+
+  document.getElementById('campaign-form-title').textContent = '✏️ Editar Campanha';
+  document.getElementById('btn-save-camp').innerHTML = '💾 Atualizar campanha';
+  document.getElementById('btn-cancel-edit').style.display = 'block';
+
+  updateLivePreview();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function handleSaveCampaign(e) {
+  e.preventDefault();
+  const editId = document.getElementById('campaign-edit-id').value;
+  const name = document.getElementById('camp-name').value.trim();
+  const origPrice = parseFloat(document.getElementById('camp-original-price').value);
+  const promoPrice = parseFloat(document.getElementById('camp-promo-price').value);
+  const expiry = document.getElementById('camp-expiry').value;
+  const obs = document.getElementById('camp-obs').value.trim();
+  const photo = document.getElementById('camp-photo-data').value;
+
+  if (!name || isNaN(origPrice) || isNaN(promoPrice) || !expiry) {
+    showToast('Preencha os campos obrigatórios.', '⚠️');
+    return;
+  }
+
+  if (promoPrice >= origPrice) {
+    showToast('O preço promocional deve ser menor que o original.', '⚠️');
+    return;
+  }
+
+  const discount = calculateDiscount(origPrice, promoPrice);
+
+  if (editId) {
+    const idx = campaigns.findIndex(c => c.id === editId);
+    if (idx !== -1) {
+      campaigns[idx] = {
+        ...campaigns[idx],
+        name,
+        originalPrice: origPrice,
+        promoPrice,
+        discountPct: discount,
+        expiryDate: expiry,
+        observation: obs,
+        photo: photo || campaigns[idx].photo
+      };
+    }
+  } else {
+    const newCamp = {
+      id: 'camp_' + Date.now(),
+      name,
+      originalPrice: origPrice,
+      promoPrice,
+      discountPct: discount,
+      expiryDate: expiry,
+      observation: obs,
+      photo: photo || ''
+    };
+    campaigns.unshift(newCamp);
+  }
+
+  saveCampaignsToStorage();
+  openNewCampaignForm();
+  renderCampaignsList();
+
+  // Cloud sync
+  const payload = {
+    action: 'addCampaign',
+    nome: name,
+    precoNormal: origPrice,
+    precoPromo: promoPrice,
+    desconto: discount,
+    validade: expiry,
+    obs: obs,
+    foto: photo || ''
+  };
+
+  const cloudSuccess = await sendCloudAction(payload);
+  if (cloudSuccess) {
+    showToast('✔️ Salvo na nuvem');
+  } else {
+    showToast('📴 Sem conexão — salvo neste aparelho, sincroniza automaticamente');
+  }
+}
+
+async function deleteCampaign(id) {
+  const camp = campaigns.find(c => c.id === id);
+  if (!camp) return;
+  if (!confirm(`Deseja excluir a promoção "${camp.name}"?`)) return;
+
+  const targetName = camp.name;
+  campaigns = campaigns.filter(c => c.id !== id);
+  saveCampaignsToStorage();
+  renderCampaignsList();
+
+  // Cloud sync
+  const payload = {
+    action: 'deleteCampaign',
+    nome: targetName
+  };
+
+  const cloudSuccess = await sendCloudAction(payload);
+  if (cloudSuccess) {
+    showToast('Campanha excluída da nuvem.');
+  } else {
+    showToast('Campanha excluída localmente (pendente na nuvem).');
+  }
+}
+
+function renderCampaignsList() {
+  const list = document.getElementById('campaigns-list');
+  const badge = document.getElementById('campaigns-badge');
+  badge.textContent = campaigns.length;
+
+  if (campaigns.length === 0) {
+    list.innerHTML = `
+      <div style="text-align:center; color:#94a3b8; padding:20px; font-size:0.88rem;">
+        Nenhuma campanha criada ainda.
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = campaigns.map(c => {
+    const active = isCampaignActive(c.expiryDate);
+    return `
+      <div class="campaign-card">
+        <div class="campaign-thumb">
+          ${c.photo ? `<img src="${c.photo}" alt="${escapeHtml(c.name)}">` : '<span style="font-size:1.4rem;">🏷️</span>'}
+        </div>
+        <div class="item-details">
+          <div class="item-name">${escapeHtml(c.name)}</div>
+          <div class="item-sub">
+            <strong style="color:var(--accent-text); font-size:0.9rem;">${formatBRL(c.promoPrice)}</strong>
+            <span class="badge-status ${active ? 'badge-active' : 'badge-expired'}" style="margin-left:6px;">
+              ${active ? 'Ativa' : 'Expirada'}
+            </span>
+          </div>
+          <div style="font-size:0.72rem; color:#64748b; margin-top:2px;">
+            Vence em: ${formatDateBR(c.expiryDate)}
+          </div>
+        </div>
+        <div style="display:flex; gap:4px; flex-shrink:0;">
+          <button class="btn-edit" title="Editar" onclick="editCampaign('${c.id}')" aria-label="Editar">
+            ✏️
+          </button>
+          <button class="btn-icon-del" title="Excluir" onclick="deleteCampaign('${c.id}')" aria-label="Excluir">
+            🗑️
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// SEND TAB LOGIC
+function prepareSendTab() {
+  // Populate campaigns dropdown
+  const select = document.getElementById('send-campaign-select');
+  const prevVal = select.value;
+  select.innerHTML = '<option value="">Selecione uma campanha...</option>' +
+    campaigns.map(c => {
+      const activeText = isCampaignActive(c.expiryDate) ? '' : ' (Expirada)';
+      return `<option value="${c.id}">${escapeHtml(c.name)} - ${formatBRL(c.promoPrice)}${activeText}</option>`;
+    }).join('');
+
+  if (prevVal && campaigns.some(c => c.id === prevVal)) {
+    select.value = prevVal;
+  } else if (campaigns.length > 0) {
+    select.value = campaigns[0].id;
+  }
+
+  // Populate recipients checklist (Default: all checked)
+  selectedRecipientEmails.clear();
+  contacts.forEach(c => selectedRecipientEmails.add(c.email));
+
+  renderRecipientsList();
+  updateSendTabMessage();
+}
+
+function renderRecipientsList() {
+  const container = document.getElementById('recipients-list');
+  const countSpan = document.getElementById('recipients-count');
+  countSpan.textContent = selectedRecipientEmails.size;
+
+  if (contacts.length === 0) {
+    container.innerHTML = `<div style="text-align:center; color:#94a3b8; font-size:0.8rem; padding:8px;">Nenhum contato cadastrado para envio.</div>`;
+    return;
+  }
+
+  container.innerHTML = contacts.map(c => {
+    const isChecked = selectedRecipientEmails.has(c.email);
+    return `
+      <label class="recipient-row">
+        <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleRecipient('${c.email}', this.checked)">
+        <div class="recipient-info">
+          <strong>${escapeHtml(c.name || c.email)}</strong>
+          ${c.name ? `<span>${escapeHtml(c.email)}</span>` : ''}
+        </div>
+      </label>
+    `;
+  }).join('');
+}
+
+function toggleRecipient(email, isChecked) {
+  if (isChecked) {
+    selectedRecipientEmails.add(email);
+  } else {
+    selectedRecipientEmails.delete(email);
+  }
+  document.getElementById('recipients-count').textContent = selectedRecipientEmails.size;
+  updateSendTabMessage();
+}
+
+function toggleAllRecipients() {
+  if (selectedRecipientEmails.size === contacts.length) {
+    selectedRecipientEmails.clear();
+  } else {
+    contacts.forEach(c => selectedRecipientEmails.add(c.email));
+  }
+  renderRecipientsList();
+  updateSendTabMessage();
+}
+
+function buildCampaignEmailBody(camp) {
+  if (!camp) return '';
+  const discount = (camp.discountPct !== undefined && camp.discountPct !== null && camp.discountPct !== '')
+    ? camp.discountPct
+    : calculateDiscount(camp.originalPrice, camp.promoPrice);
+
+  return `Olá! Tudo bem?
+
+Preparamos uma condição muito especial e imperdível para você hoje:
+
+🏷️ PRODUTO: ${camp.name}
+💰 De: ${formatBRL(camp.originalPrice)}
+✨ Por APENAS: ${formatBRL(camp.promoPrice)} (${discount}% de desconto real!)
+⏰ Válido até: ${formatDateBR(camp.expiryDate)}
+
+${camp.observation ? `📌 Detalhes: ${camp.observation}\n\n` : ''}⚡ Atenção: Esta oferta é exclusiva por tempo limitado e sujeita à disponibilidade do estoque. 
+
+Para garantir o seu agora, basta responder a este e-mail ou entrar em contato conosco!
+
+Um grande abraço,
+Equipe de Atendimento`;
+}
+
+// PER-CAMPAIGN CUSTOM MESSAGES STORAGE HELPERS
+function getCustomMessagesMap() {
+  try {
+    const raw = localStorage.getItem(STORAGE_CUSTOM_MESSAGES);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveCustomMessagesMap(map) {
+  try {
+    localStorage.setItem(STORAGE_CUSTOM_MESSAGES, JSON.stringify(map));
+  } catch (e) {
+    console.error('Falha ao salvar mensagens personalizadas', e);
+  }
+}
+
+function getSelectedCampaign() {
+  const campId = document.getElementById('send-campaign-select') ? document.getElementById('send-campaign-select').value : '';
+  if (!campId) return null;
+  return campaigns.find(c => c.id === campId) || null;
+}
+
+function getCurrentMessageText() {
+  const textarea = document.getElementById('send-message-text');
+  if (textarea && typeof textarea.value === 'string' && textarea.value.length > 0) {
+    return textarea.value;
+  }
+  const camp = getSelectedCampaign();
+  if (!camp) return '';
+  const map = getCustomMessagesMap();
+  if (map[camp.name] !== undefined) {
+    return map[camp.name];
+  }
+  return buildCampaignEmailBody(camp);
+}
+
+function onCustomMessageInput(val) {
+  const camp = getSelectedCampaign();
+  if (!camp) return;
+  const map = getCustomMessagesMap();
+  map[camp.name] = val;
+  saveCustomMessagesMap(map);
+  currentGeneratedBody = val;
+}
+
+function resetCustomMessage() {
+  const camp = getSelectedCampaign();
+  if (!camp) {
+    showToast('Selecione uma campanha primeiro.', '⚠️');
+    return;
+  }
+  const map = getCustomMessagesMap();
+  delete map[camp.name];
+  saveCustomMessagesMap(map);
+
+  const defaultBody = buildCampaignEmailBody(camp);
+  const textarea = document.getElementById('send-message-text');
+  if (textarea) textarea.value = defaultBody;
+  currentGeneratedBody = defaultBody;
+  showToast('Mensagem restaurada para o padrão!', '↩️');
+}
+
+function updateSendTabMessage() {
+  const camp = getSelectedCampaign();
+  const resultCard = document.getElementById('email-result-card');
+  const subjectEl = document.getElementById('email-subject-text');
+  const textarea = document.getElementById('send-message-text');
+
+  if (resultCard) resultCard.style.display = 'block';
+
+  if (!camp) {
+    if (subjectEl) subjectEl.textContent = 'Selecione uma campanha acima';
+    if (textarea) textarea.value = '';
+    currentGeneratedSubject = '';
+    currentGeneratedBody = '';
+    return;
+  }
+
+  const subject = `🏷️ ${camp.name} em promoção: ${formatBRL(camp.promoPrice)}`;
+  currentGeneratedSubject = subject;
+  if (subjectEl) subjectEl.textContent = subject;
+
+  // Retrieve saved custom message for this campaign, or fallback to default template
+  const map = getCustomMessagesMap();
+  if (map[camp.name] !== undefined) {
+    if (textarea) textarea.value = map[camp.name];
+    currentGeneratedBody = map[camp.name];
+  } else {
+    const defaultBody = buildCampaignEmailBody(camp);
+    if (textarea) textarea.value = defaultBody;
+    currentGeneratedBody = defaultBody;
+  }
+}
+
+function generateEmailPreview() {
+  updateSendTabMessage();
+}
+
+// WHATSAPP MODAL & SENDING LOGIC
+function openWhatsAppModal() {
+  const waContacts = contacts.filter(c => !!c.whatsapp);
+  if (waContacts.length === 0) {
+    showToast('Nenhum contato com WhatsApp cadastrado. Cadastre um número na aba Contatos.', '⚠️');
+    return;
+  }
+
+  const listEl = document.getElementById('wa-modal-list');
+  if (listEl) {
+    listEl.innerHTML = waContacts.map(c => `
+      <button type="button" class="wa-contact-row" onclick="selectWaRecipient('${c.id}')">
+        <span class="wa-contact-row-name">${escapeHtml(c.name || 'Sem nome')}</span>
+        <span class="wa-contact-row-num">📱 ${escapeHtml(formatWhatsAppDisplay(c.whatsapp))}</span>
+      </button>
+    `).join('');
+  }
+
+  const modal = document.getElementById('wa-modal');
+  if (modal) {
+    modal.classList.add('active');
+  }
+}
+
+function closeWhatsAppModal() {
+  const modal = document.getElementById('wa-modal');
+  if (modal) {
+    modal.classList.remove('active');
+  }
+}
+
+function handleWaModalOverlayClick(event) {
+  if (event.target && event.target.id === 'wa-modal') {
+    closeWhatsAppModal();
+  }
+}
+
+function selectWaRecipient(contactId) {
+  const contact = contacts.find(c => c.id === contactId);
+  if (!contact || !contact.whatsapp) return;
+
+  closeWhatsAppModal();
+
+  const msg = getCurrentMessageText();
+  const waUrl = `https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(msg)}`;
+  window.open(waUrl, '_blank');
+
+  const targetName = contact.name ? contact.name : formatWhatsAppDisplay(contact.whatsapp);
+  showToast(`Abrindo WhatsApp para ${targetName}`, '📱');
+}
+
+function copyCurrentMessage() {
+  const msg = getCurrentMessageText();
+  if (!msg.trim()) {
+    showToast('Nenhuma mensagem para copiar.', '⚠️');
+    return;
+  }
+  navigator.clipboard.writeText(msg).then(() => {
+    showToast('Mensagem copiada para a área de transferência!');
+  }).catch(() => {
+    const textarea = document.createElement('textarea');
+    textarea.value = msg;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    showToast('Mensagem copiada para a área de transferência!');
+  });
+}
+
+function copyWhatsAppMessage() {
+  copyCurrentMessage();
+}
+
+function copyEmailToClipboard() {
+  copyCurrentMessage();
+}
+
+function openEmailClient() {
+  const camp = getSelectedCampaign();
+  if (!camp) {
+    showToast('Selecione uma campanha primeiro.', '⚠️');
+    return;
+  }
+
+  if (selectedRecipientEmails.size === 0) {
+    showToast('Selecione ao menos 1 destinatário de e-mail.', '⚠️');
+    return;
+  }
+
+  const body = getCurrentMessageText();
+  if (!body.trim()) {
+    showToast('A mensagem está vazia.', '⚠️');
+    return;
+  }
+
+  const subject = currentGeneratedSubject || `🏷️ ${camp.name} em promoção: ${formatBRL(camp.promoPrice)}`;
+  const bccList = Array.from(selectedRecipientEmails).join(';');
+  const mailtoUri = `mailto:?bcc=${bccList}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+  window.location.href = mailtoUri;
+}
+
+// SECURITY HELPER
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// INIT ON DOM READY
+document.addEventListener('DOMContentLoaded', async () => {
+  const mascotImg = document.getElementById('app-mascot');
+  if (mascotImg) {
+    mascotImg.onerror = function() {
+      this.style.display = 'none';
+    };
+  }
+
+  loadData();
+  openNewCampaignForm();
+  reRenderAllTabs();
+
+  // ALWAYS SYNC FROM CLOUD ON INIT WITH SILENT RETRY
+  updateSyncUI('syncing');
+
+  // Inicia sincronização automática da fila se já houver itens pendentes salvos
+  if (getPendingQueue().length > 0) {
+    scheduleQueueSync(3000);
+  }
+
+  try {
+    const ok = await fetchCloudDataWithRetry(2, 2000);
+    if (ok) {
+      if (getPendingQueue().length > 0) {
+        await processQueue();
+      }
+      reRenderAllTabs();
+      updateSyncUI();
+    } else {
+      updateSyncUI();
+      if (getPendingQueue().length > 0) {
+        scheduleQueueSync(3000);
+      }
+    }
+  } catch (e) {
+    updateSyncUI();
+    if (getPendingQueue().length > 0) {
+      scheduleQueueSync(3000);
+    }
+  }
+});
+
+// Listener para sincronizar automaticamente quando o dispositivo reconectar à internet
+window.addEventListener('online', () => {
+  if (getPendingQueue().length > 0) {
+    scheduleQueueSync(1000);
+  } else {
+    syncNow(false);
+  }
+});
+</script>
+
+<script>
+/* Skip artifact shell — fixed helpers served beside every artifact. */
+(function () {
+  "use strict";
+
+  var fmt = {
+    num: function (v, opts) { return new Intl.NumberFormat("pt-BR", opts || {}).format(v); },
+    brl: function (v) { return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v); },
+    pct: function (v) { return new Intl.NumberFormat("pt-BR", { style: "percent", maximumFractionDigits: 1 }).format(v); }
+  };
+
+  // axisFmt keeps axis tick labels short (compact notation) so long values
+  // (e.g. full BRL amounts) never clip against the plot edge.
+  function axisFmt(v) {
+    return fmt.num(v, { notation: "compact", maximumFractionDigits: 1 });
+  }
+
+  // format accepts a function OR one of the fmt names ("num" | "brl" | "pct").
+  function coerceFormat(spec) {
+    if (typeof spec === "function") return spec;
+    if (typeof spec === "string" && fmt[spec]) return fmt[spec];
+    return function (v) { return fmt.num(v); };
+  }
+
+  function accent() {
+    return getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#2563eb";
+  }
+  function mutedColor() {
+    return getComputedStyle(document.documentElement).getPropertyValue("--text-muted").trim() || "#5b6472";
+  }
+  function svgEl(tag, attrs) {
+    var el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (var k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+  function frame(el, w, h) {
+    var svg = svgEl("svg", { viewBox: "0 0 " + w + " " + h, role: "img" });
+    el.innerHTML = "";
+    el.appendChild(svg);
+    return svg;
+  }
+
+  // maxOf guards the axis scale: empty values would give -Infinity (truthy,
+  // so "|| 1" can't catch it) and a non-positive max would flip the chart.
+  function maxOf(values) {
+    var m = values.length ? Math.max.apply(null, values) : 0;
+    return m > 0 ? m : 1;
+  }
+
+  // bar(el, {labels:[], values:[], color?, format?}) — vertical bar chart.
+  function bar(el, cfg) {
+    var W = 640, H = 280, padL = 46, padB = 30, padT = 12;
+    var svg = frame(el, W, H);
+    var max = maxOf(cfg.values);
+    var n = cfg.values.length;
+    var plotW = W - padL - 12, plotH = H - padT - padB;
+    var step = plotW / n, bw = Math.min(step * 0.62, 64);
+    var color = cfg.color || accent();
+    var f = coerceFormat(cfg.format);
+    for (var g = 0; g <= 4; g++) {
+      var gy = padT + plotH - (plotH * g) / 4;
+      svg.appendChild(svgEl("line", { x1: padL, y1: gy, x2: W - 12, y2: gy, stroke: "currentColor", "stroke-opacity": 0.08 }));
+      var lbl = svgEl("text", { x: padL - 8, y: gy + 4, "text-anchor": "end", "font-size": 10, fill: mutedColor() });
+      lbl.textContent = axisFmt((max * g) / 4);
+      svg.appendChild(lbl);
+    }
+    cfg.values.forEach(function (v, i) {
+      var bh = Math.max(0, (v / max) * plotH);
+      var x = padL + i * step + (step - bw) / 2;
+      var y = padT + plotH - bh;
+      var r = svgEl("rect", { x: x, y: y, width: bw, height: bh, rx: 4, fill: color });
+      var t = svgEl("title", {});
+      t.textContent = cfg.labels[i] + ": " + f(v);
+      r.appendChild(t);
+      svg.appendChild(r);
+      var tx = svgEl("text", { x: x + bw / 2, y: H - 10, "text-anchor": "middle", "font-size": 11, fill: mutedColor() });
+      tx.textContent = cfg.labels[i];
+      svg.appendChild(tx);
+    });
+  }
+
+  // line(el, {labels:[], values:[], color?, format?}) — single-series line.
+  function line(el, cfg) {
+    var W = 640, H = 280, padL = 46, padB = 30, padT = 12;
+    var svg = frame(el, W, H);
+    var max = maxOf(cfg.values);
+    var n = cfg.values.length;
+    var plotW = W - padL - 16, plotH = H - padT - padB;
+    var color = cfg.color || accent();
+    var f = coerceFormat(cfg.format);
+    for (var g = 0; g <= 4; g++) {
+      var gy = padT + plotH - (plotH * g) / 4;
+      svg.appendChild(svgEl("line", { x1: padL, y1: gy, x2: W - 16, y2: gy, stroke: "currentColor", "stroke-opacity": 0.08 }));
+      var lbl = svgEl("text", { x: padL - 8, y: gy + 4, "text-anchor": "end", "font-size": 10, fill: mutedColor() });
+      lbl.textContent = axisFmt((max * g) / 4);
+      svg.appendChild(lbl);
+    }
+    var pts = cfg.values.map(function (v, i) {
+      var x = padL + (n === 1 ? plotW / 2 : (plotW * i) / (n - 1));
+      var y = padT + plotH - (v / max) * plotH;
+      return [x, y];
+    });
+    var d = pts.map(function (p, i) { return (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1); }).join(" ");
+    svg.appendChild(svgEl("path", { d: d, fill: "none", stroke: color, "stroke-width": 2, "stroke-linejoin": "round" }));
+    pts.forEach(function (p, i) {
+      var c = svgEl("circle", { cx: p[0], cy: p[1], r: 3.5, fill: color });
+      var t = svgEl("title", {});
+      t.textContent = cfg.labels[i] + ": " + f(cfg.values[i]);
+      c.appendChild(t);
+      svg.appendChild(c);
+      var tx = svgEl("text", { x: p[0], y: H - 10, "text-anchor": "middle", "font-size": 11, fill: mutedColor() });
+      tx.textContent = cfg.labels[i];
+      svg.appendChild(tx);
+    });
+  }
+
+  // donut(el, {labels:[], values:[], colors?}) — donut with center total.
+  function donut(el, cfg) {
+    var W = 320, H = 280, cx = W / 2, cy = H / 2, R = 92, r = 58;
+    var svg = frame(el, W, H);
+    var total = cfg.values.reduce(function (a, b) { return a + b; }, 0) || 1;
+    var palette = cfg.colors || [accent(), "#1baf7a", "#eda100", "#e34948", "#4a3aa7", "#e87ba4"];
+    var a0 = -Math.PI / 2;
+    cfg.values.forEach(function (v, i) {
+      var a1 = a0 + (v / total) * Math.PI * 2;
+      var large = a1 - a0 > Math.PI ? 1 : 0;
+      var p = ["M", cx + R * Math.cos(a0), cy + R * Math.sin(a0),
+        "A", R, R, 0, large, 1, cx + R * Math.cos(a1), cy + R * Math.sin(a1),
+        "L", cx + r * Math.cos(a1), cy + r * Math.sin(a1),
+        "A", r, r, 0, large, 0, cx + r * Math.cos(a0), cy + r * Math.sin(a0), "Z"].join(" ");
+      var path = svgEl("path", { d: p, fill: palette[i % palette.length] });
+      var t = svgEl("title", {});
+      t.textContent = cfg.labels[i] + ": " + fmt.num(v) + " (" + fmt.pct(v / total) + ")";
+      path.appendChild(t);
+      svg.appendChild(path);
+      a0 = a1;
+    });
+    var center = svgEl("text", { x: cx, y: cy + 5, "text-anchor": "middle", "font-size": 20, "font-weight": 650, fill: "currentColor" });
+    center.textContent = fmt.num(total);
+    svg.appendChild(center);
+  }
+
+  window.skipShell = { fmt: fmt };
+  window.skipChart = { bar: bar, line: line, donut: donut };
+})();
+
+</script>
+</body>
+</html>
