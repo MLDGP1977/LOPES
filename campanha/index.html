@@ -2039,20 +2039,26 @@ async function handleSaveCampaign(e) {
 
   const discount = calculateDiscount(origPrice, promoPrice);
 
+  // Guarda o nome original antes de atualizar o objeto local.
+  // O Apps Script usa esse valor para localizar a linha já cadastrada.
+  const editingIndex = editId ? campaigns.findIndex(c => c.id === editId) : -1;
+  if (editId && editingIndex === -1) {
+    showToast('Não foi possível localizar a campanha que será editada. Atualize a lista e tente novamente.', '⚠️');
+    return;
+  }
+  const originalName = editingIndex >= 0 ? campaigns[editingIndex].name : '';
+
   if (editId) {
-    const idx = campaigns.findIndex(c => c.id === editId);
-    if (idx !== -1) {
-      campaigns[idx] = {
-        ...campaigns[idx],
-        name,
-        originalPrice: origPrice,
-        promoPrice,
-        discountPct: discount,
-        expiryDate: expiry,
-        observation: obs,
-        photo: photo || campaigns[idx].photo
-      };
-    }
+    campaigns[editingIndex] = {
+      ...campaigns[editingIndex],
+      name,
+      originalPrice: origPrice,
+      promoPrice,
+      discountPct: discount,
+      expiryDate: expiry,
+      observation: obs,
+      photo: photo || campaigns[editingIndex].photo
+    };
   } else {
     const newCamp = {
       id: 'camp_' + Date.now(),
@@ -2073,7 +2079,9 @@ async function handleSaveCampaign(e) {
 
   // Cloud sync
   const payload = {
-    action: 'addCampaign',
+    // Edição atualiza a campanha existente; cadastro novo continua adicionando.
+    action: editId ? 'updateCampaign' : 'addCampaign',
+    nomeOriginal: editId ? originalName : '',
     nome: name,
     precoNormal: origPrice,
     precoPromo: promoPrice,
